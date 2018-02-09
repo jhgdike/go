@@ -44,7 +44,6 @@ WRAP:
 	if t.Year() > yearLimit {
 		return time.Time{}
 	}
-
 	// Find the first applicable month.
 	// If it's this month, then do nothing.
 	for 1<<uint(t.Month())&s.Month == 0 {
@@ -92,7 +91,7 @@ WRAP:
 		}
 		t = t.Add(1 * time.Minute)
 
-		if t.Hour() == 0 {
+		if t.Minute() == 0 {
 			goto WRAP
 		}
 	}
@@ -120,7 +119,7 @@ func dayMatches(s *Schedule, t time.Time) bool {
 	if s.Day&starBit > 0 || s.WeekDay&starBit > 0 {
 		return dayMatch && weekDayMatch
 	}
-	return dayMatch && weekDayMatch
+	return dayMatch || weekDayMatch
 }
 
 // * 30 5 * * *
@@ -263,4 +262,9 @@ func getBits(min, max, step uint) uint64 {
 		bits |= 1 << i
 	}
 	return bits
+}
+
+// all returns all bits within the given bounds.  (plus the star bit)
+func all(r bounds) uint64 {
+	return getBits(r.min, r.max, 1) | starBit
 }
